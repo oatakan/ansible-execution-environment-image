@@ -1,0 +1,13 @@
+collections:
+  - name: awx.awx
+  - name: azure.azcollection
+  - name: amazon.aws
+  - name: theforeman.foreman
+  - name: google.cloud
+  - name: openstack.cloud
+  - name: community.vmware
+  - name: ovirt.ovirt
+  - name: ansible.posix
+  - name: ansible.windows
+  - name: community.general
+  - name: community.windows

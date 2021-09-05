@@ -1,0 +1,12 @@
+awxkit>=19.0.0
+pypsrp
+urllib3
+pywinrm
+requests-credssp
+boto
+botocore
+boto3
+git+https://github.com/vmware/vsphere-automation-sdk-python.git
+ovirt-engine-sdk-python>=4.4.0
+openstacksdk>=0.12.0
+openshift>=0.6
