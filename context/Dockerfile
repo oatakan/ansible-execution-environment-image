@@ -15,6 +15,8 @@ FROM $EE_BUILDER_IMAGE as builder
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
+WORKDIR /build
+
 ADD requirements.txt /build/requirements.txt
 ADD bindep.txt /build/bindep.txt
 RUN ansible-builder introspect --sanitize --user-pip=requirements.txt --user-bindep=bindep.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
