@@ -11,3 +11,5 @@ collections:
   - name: ansible.windows
   - name: community.general
   - name: community.windows
+  - name: kubernetes.core
+    version: 1.2.1
