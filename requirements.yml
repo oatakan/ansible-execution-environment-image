@@ -14,3 +14,4 @@ collections:
   - name: community.kubevirt
   - name: kubernetes.core
     version: 1.2.1
+  - name: ansible.netcommon
