@@ -16,3 +16,4 @@ sendgrid
 passlib
 pyapi-gitlab
 pysnow
+requests
