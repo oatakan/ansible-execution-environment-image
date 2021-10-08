@@ -18,3 +18,4 @@ collections:
   - name: kubernetes.core
     version: 2.1.1
   - name: ansible.netcommon
+  - name: vmware.vmware_rest
