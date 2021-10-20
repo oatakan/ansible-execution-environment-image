@@ -18,3 +18,4 @@ passlib
 pyapi-gitlab
 pysnow
 aiohttp
+pymssql
