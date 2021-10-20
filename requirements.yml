@@ -6,6 +6,7 @@ collections:
   - name: google.cloud
   - name: openstack.cloud
   - name: community.vmware
+  - name: community.aws
   - name: ovirt.ovirt
   - name: ansible.posix
   - name: ansible.windows
