@@ -19,4 +19,4 @@ pyapi-gitlab
 pysnow
 aiohttp
 pymssql
-sendgrid
+sendgrid==1.6.22
