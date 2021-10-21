@@ -19,3 +19,4 @@ pyapi-gitlab
 pysnow
 aiohttp
 pymssql
+sendgrid
