@@ -20,3 +20,4 @@ collections:
     version: 2.1.1
   - name: ansible.netcommon
   - name: vmware.vmware_rest
+  - name: chocolatey.chocolatey
