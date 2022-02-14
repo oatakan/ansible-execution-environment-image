@@ -12,6 +12,7 @@ collections:
   - name: ansible.windows
   - name: community.general
   - name: community.windows
+  - name: community.azure
   - name: community.kubernetes
     version: 1.2.1
   - name: community.kubevirt
