@@ -20,3 +20,4 @@ pysnow
 aiohttp
 pymssql
 sendgrid==1.6.22
+bs4
