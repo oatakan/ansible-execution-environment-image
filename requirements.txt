@@ -9,6 +9,7 @@ botocore
 boto3
 git+https://github.com/vmware/vsphere-automation-sdk-python.git
 ovirt-engine-sdk-python>=4.4.0
+ovirt-imageio
 openstacksdk>=0.12.0
 openshift>=0.6
 netaddr
