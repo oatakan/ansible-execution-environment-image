@@ -13,6 +13,7 @@ ovirt-imageio
 openstacksdk>=0.12.0
 openshift>=0.6
 netaddr
+pandas
 pyprowl
 sendgrid
 passlib
