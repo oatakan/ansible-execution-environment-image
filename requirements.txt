@@ -1,3 +1,4 @@
+ansible[azure]
 awxkit>=19.0.0
 pypsrp
 urllib3==1.26.7
