@@ -4,7 +4,7 @@ awxkit>=19.0.0
 pypsrp
 urllib3==1.26.7
 requests==2.25.1
-cryptography==2.8
+cryptography==3.4
 pywinrm
 requests-credssp
 boto
