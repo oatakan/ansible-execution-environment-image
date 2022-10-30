@@ -23,6 +23,3 @@ collections:
   - name: ansible.netcommon
   - name: vmware.vmware_rest
   #- name: chocolatey.chocolatey # requirements conflict with community.vmware
-  - name: https://github.com/oatakan/chocolatey-ansible.git#/chocolatey/
-    type: git
-    version: update_reqs
