@@ -32,3 +32,6 @@ RUN /output/install-from-bindep && rm -rf /output/wheels
 RUN alternatives --set python /usr/bin/python3
 COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/receptor
 RUN mkdir -p /var/run/receptor
+RUN pip uninstall urllib3 -y && pip install urllib3
+# fix for pyOpenSSL<20.0.0 required for ansible-runner:2.9
+RUN pip install 'pyOpenSSL<20.0.0' git+https://github.com/vmware/vsphere-automation-sdk-python.git@v8.0.0.0

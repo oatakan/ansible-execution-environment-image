@@ -3,11 +3,14 @@ collections:
   - name: azure.azcollection
   - name: amazon.cloud
   - name: amazon.aws
+    version: 4.3.0
   - name: theforeman.foreman
   - name: google.cloud
   - name: openstack.cloud
   - name: community.vmware
+    version: 2.9.0
   - name: community.aws
+    version: 4.3.0
   - name: ovirt.ovirt
   - name: ansible.posix
   - name: ansible.windows
