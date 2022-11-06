@@ -32,5 +32,5 @@ RUN /output/install-from-bindep && rm -rf /output/wheels
 RUN alternatives --set python /usr/bin/python3
 COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/receptor
 RUN mkdir -p /var/run/receptor
-RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.2.1#egg=ansible-runner
+RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.1.3#egg=ansible-runner
 RUN pip uninstall urllib3 -y && pip install urllib3
