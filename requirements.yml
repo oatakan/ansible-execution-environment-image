@@ -21,6 +21,7 @@ collections:
     version: 1.2.1
   - name: community.kubevirt
   - name: community.okd
+  - name: community.postgresql
   - name: kubernetes.core
     version: 2.1.1
   - name: ansible.netcommon
