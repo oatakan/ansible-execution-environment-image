@@ -17,6 +17,7 @@ collections:
   - name: community.kubernetes
   - name: community.kubevirt
   - name: community.okd
+  - name: community.postgresql
   - name: kubernetes.core
   - name: ansible.netcommon
   - name: vmware.vmware_rest
