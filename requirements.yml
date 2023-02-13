@@ -7,6 +7,7 @@ collections:
   - name: theforeman.foreman
   - name: google.cloud
   - name: openstack.cloud
+    version: 2.0.0
   - name: community.vmware
     version: 2.9.0
   - name: community.aws
@@ -21,6 +22,7 @@ collections:
     version: 1.2.1
   - name: community.kubevirt
   - name: community.okd
+    version: 2.2.0
   - name: community.postgresql
   - name: kubernetes.core
     version: 2.1.1
