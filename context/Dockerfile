@@ -34,3 +34,14 @@ COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/
 RUN mkdir -p /var/run/receptor
 RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.3.1#egg=ansible-runner
 RUN pip uninstall urllib3 -y && pip install urllib3
+
+RUN cp /usr/share/ansible-runner/utils/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod 755 /usr/local/bin/entrypoint
+
+ENTRYPOINT ["entrypoint"]
+
+# NB: this appears to be necessary for container builds based on this container, since we can't rely on the entrypoint
+# script to run during a build to fix up /etc/passwd. This envvar value, and the fact that all user homedirs are
+# set to /home/runner is an implementation detail that may change with future versions of runner and should not be
+# assumed by other code or tools.
+ENV HOME=/home/runner
