@@ -15,7 +15,7 @@ collections:
   - name: community.windows
   - name: community.azure
   - name: community.kubernetes
-  - name: community.kubevirt
+#  - name: community.kubevirt # disable as it's not compatible with the latest version of Ansible
   - name: community.okd
   - name: community.postgresql
   - name: kubernetes.core
