@@ -32,10 +32,10 @@ RUN /output/install-from-bindep && rm -rf /output/wheels
 RUN alternatives --set python /usr/bin/python3
 COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/receptor
 RUN mkdir -p /var/run/receptor
-RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.3.1#egg=ansible-runner
+RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.3.2#egg=ansible-runner
 RUN pip uninstall urllib3 -y && pip install urllib3
 
-RUN cp /usr/share/ansible-runner/utils/entrypoint.sh /usr/local/bin/entrypoint
+RUN cp /usr/local/share/ansible-runner/utils/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod 755 /usr/local/bin/entrypoint
 
 ENTRYPOINT ["entrypoint"]
