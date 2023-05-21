@@ -8,6 +8,7 @@ collections:
   - name: openstack.cloud
   - name: community.vmware
   - name: community.aws
+  - name: community.crypto
   - name: ovirt.ovirt
   - name: ansible.posix
   - name: ansible.windows

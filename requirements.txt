@@ -12,3 +12,4 @@ sendgrid==1.6.22
 bs4>=0.0.1
 html5lib>=1.1
 openstacksdk>=1.0
+pandas
