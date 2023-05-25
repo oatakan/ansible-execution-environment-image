@@ -33,7 +33,7 @@ RUN alternatives --set python /usr/bin/python3
 COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/receptor
 RUN mkdir -p /var/run/receptor
 RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.3.2#egg=ansible-runner
-RUN pip uninstall urllib3 -y && pip install urllib3
+RUN pip uninstall urllib3 requests -y && pip install urllib3 requests
 RUN pip uninstall pyOpenSSL cryptography -y && pip install pyOpenSSL>22.1.0
 
 RUN cp /usr/local/share/ansible-runner/utils/entrypoint.sh /usr/local/bin/entrypoint
