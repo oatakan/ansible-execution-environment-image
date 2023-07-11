@@ -19,6 +19,8 @@ WORKDIR /build
 
 ADD requirements.txt /build/requirements.txt
 ADD bindep.txt /build/bindep.txt
+RUN dnf install -y yum-utils
+RUN yum-config-manager --enable epel
 RUN ansible-builder introspect --sanitize --user-pip=requirements.txt --user-bindep=bindep.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
 RUN assemble
 
@@ -28,6 +30,8 @@ USER root
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
 COPY --from=builder /output/ /output/
+RUN dnf install -y yum-utils
+RUN yum-config-manager --enable epel
 RUN /output/install-from-bindep && rm -rf /output/wheels
 RUN alternatives --set python /usr/bin/python3
 COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/receptor
@@ -35,6 +39,7 @@ RUN mkdir -p /var/run/receptor
 RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.3.2#egg=ansible-runner
 RUN pip uninstall urllib3 requests -y && pip install urllib3 requests
 RUN pip uninstall pyOpenSSL cryptography -y && pip install pyOpenSSL>22.1.0
+RUN dnf install -y ftp://ftp.pbone.net/mirror/archive.fedoraproject.org/fedora/linux/releases/33/Everything/x86_64/os/Packages/c/chntpw-1.00-7.140201.fc33.x86_64.rpm
 
 RUN cp /usr/local/share/ansible-runner/utils/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod 755 /usr/local/bin/entrypoint
