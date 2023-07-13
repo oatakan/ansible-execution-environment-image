@@ -40,6 +40,7 @@ dependencies:
         type: git
         version: update_reqs
   system: |
+    which [platform:rpm]
     git-core [platform:rpm]
     python3.9-devel [platform:rpm compile]
     libcurl-devel [platform:rpm compile]
@@ -68,6 +69,7 @@ dependencies:
     pyOpenSSL
     pypsrp[kerberos,credssp]
     pywinrm[kerberos,credssp]
+    requests-credssp
     toml
     pexpect>=4.5
     python-daemon
