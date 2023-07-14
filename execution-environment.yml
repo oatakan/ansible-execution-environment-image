@@ -67,7 +67,7 @@ dependencies:
     ncclient
     paramiko
     pykerberos
-    pyOpenSSL
+    pyOpenSSL>=23.2.0
     pypsrp[kerberos,credssp]
     pywinrm[kerberos,credssp]
     requests-credssp
