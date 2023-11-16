@@ -32,6 +32,7 @@ dependencies:
     #  - name: community.kubevirt # disable as it's not compatible with the latest version of Ansible
       - name: community.okd
       - name: community.postgresql
+      - name: community.mysql
       - name: kubernetes.core
       - name: ansible.netcommon
       - name: vmware.vmware_rest
