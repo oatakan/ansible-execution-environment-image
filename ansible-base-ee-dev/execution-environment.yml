@@ -20,6 +20,7 @@ dependencies:
       - name: google.cloud
       - name: openstack.cloud
       - name: community.vmware
+        version: 3.9.0  # pinning until 4.0.1 is released with pr #1919
       - name: community.aws
       - name: community.crypto
       - name: ovirt.ovirt
@@ -36,10 +37,7 @@ dependencies:
       - name: kubernetes.core
       - name: ansible.netcommon
       - name: vmware.vmware_rest
-      - name: chocolatey.chocolatey # requirements conflict with community.vmware
-#      - name: https://github.com/oatakan/chocolatey-ansible.git#/chocolatey/
-#        type: git
-#        version: update_reqs
+      - name: chocolatey.chocolatey
   system: |
     which [platform:rpm]
     git-core [platform:rpm]
@@ -63,7 +61,9 @@ dependencies:
     cabextract [platform:rpm]
     wimlib-utils [platform:rpm]
     genisoimage [platform:rpm]
-    freetds-devel [platform:rpm]
+    freetds-devel [platform:rpm compile]
+    gcc [platform:rpm]
+    gcc-c++ [platform:rpm]
   python: |
     git+https://github.com/ansible/ansible-sign
     ncclient
@@ -94,7 +94,9 @@ dependencies:
     pandas
 additional_build_steps:
   append_base:
-    - RUN $PYCMD -m pip install -U pip
+    - RUN $PYCMD -m pip install --upgrade pip setuptools wheel
+    # this is needed for arm64 until the issue #619 with pendulum resolved
+    - RUN if [ "$(uname -m)" = "aarch64" ]; then $PYCMD -m pip install msgraph_sdk; fi
     - RUN dnf install -y epel-release
   append_final:
     - COPY --from=quay.io/ansible/receptor:devel /usr/bin/receptor /usr/bin/receptor

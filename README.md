@@ -1,10 +1,9 @@
 # ansible-execution-environment-image
 This repo contains a sample Ansible Execution Environment image build files
 
-You can build with docker or podman:
+Use ansible-builder to build or github actions.
 
-*podman build -f context/Dockerfile -t user/ansible-ee-image .*
+To build with ansible-builder:
 
-Run built image:
-
-*podman run -it --rm user/ansible-ee-image /bin/bash*
+pip install -r requirements.txt
+ansible-builder build -v 3 --context=ansible-base-ee-dev --tag=ansible-base-ee-dev:latest
