@@ -10,10 +10,6 @@ on:
     paths:
       - 'ansible-base-ee-main/**'
 
-  # Schedule workflow run at 00:00 on Sunday
-  schedule:
-    - cron: '0 0 * * 0'
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -25,6 +21,7 @@ jobs:
       EE_FOLDER_NAME: 'ansible-base-ee-main'
       EE_IMAGE_TAG: 'latest'
       QUAY_USER: 'oatakan'
+      PLATFORMS_JSON: '["linux/amd64"]'
     secrets:
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}

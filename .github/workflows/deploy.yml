@@ -21,6 +21,11 @@ on:
         description: 'this is used during the image push to quay'
         required: true
         type: string
+      PLATFORMS_JSON:
+        description: 'platforms for matrix as JSON string'
+        default: '["linux/amd64"]'
+        required: false
+        type: string
     secrets:
       QUAY_PASSWORD:
         description: 'needed for registry login'
@@ -35,6 +40,10 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJson(inputs.PLATFORMS_JSON) }}
     environment: deploy
     steps:
 
