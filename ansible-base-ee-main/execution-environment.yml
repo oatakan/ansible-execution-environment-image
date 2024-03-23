@@ -84,7 +84,7 @@ additional_build_steps:
     - RUN mkdir -p /var/run/receptor
     - RUN pip uninstall ansible-runner -y && pip install git+https://github.com/ansible/ansible-runner.git@2.3.4#egg=ansible-runner
     - RUN pip uninstall urllib3 requests -y && pip install urllib3 requests
-    - RUN pip uninstall pyOpenSSL cryptography -y && pip install pyOpenSSL==23.3.0
+    - RUN pip uninstall pyOpenSSL cryptography -y && pip install pyOpenSSL==23.2.0
     - RUN dnf install -y ftp://ftp.pbone.net/mirror/archive.fedoraproject.org/fedora/linux/releases/33/Everything/x86_64/os/Packages/c/chntpw-1.00-7.140201.fc33.x86_64.rpm
   append_final:
     - RUN alternatives --set python /usr/bin/python3
