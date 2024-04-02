@@ -51,8 +51,8 @@ jobs:
       - name: Get platform name
         id: get-platform-name
         run: |
-          platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+          platform_name=$(echo ${{ matrix.platform }} | cut -d '/' -f2)
+          echo "PLATFORM_PAIR=${platform_name}" >> $GITHUB_ENV
 
       - name: Checkout repo
         uses: actions/checkout@v4
