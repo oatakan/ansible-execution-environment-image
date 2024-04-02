@@ -86,8 +86,6 @@ jobs:
             ${{ inputs.EE_IMAGE_TAG }}-${{ steps.get-platform-name.outputs.platform_name }}
             ${{ github.sha }}
           registry: quay.io/${{ inputs.QUAY_USER }}/
-          username: ${{ secrets.REDHAT_USERNAME }}
-          password: ${{ secrets.REDHAT_PASSWORD }}
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
@@ -121,8 +119,8 @@ jobs:
         uses: redhat-actions/podman-login@v1
         with:
           registry: quay.io
-          username: ${{ secrets.REDHAT_USERNAME }}
-          password: ${{ secrets.REDHAT_PASSWORD }}
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
 
       - name: Create and Push Docker Manifest
         run: |
