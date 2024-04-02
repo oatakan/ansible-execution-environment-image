@@ -107,7 +107,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}:${{ inputs.EE_FOLDER_NAME }}/context"
+          context: "${{ inputs.EE_FOLDER_NAME }}/context"
           platforms: ${{ matrix.platform }}
           push: false
           tags: |
