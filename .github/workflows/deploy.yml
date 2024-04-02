@@ -83,19 +83,25 @@ jobs:
 #          --tag=${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
 #          --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
 
-      - name: Create build files
-        id: build-image
-        working-directory: ${{ inputs.EE_FOLDER_NAME }}
-        run: |
+#      - name: Create build files
+#        id: build-image
+#        working-directory: ${{ inputs.EE_FOLDER_NAME }}
+#        run: |
 #          docker buildx create --name ${{ inputs.EE_FOLDER_NAME }}-buildx
 #          docker buildx use ${{ inputs.EE_FOLDER_NAME }}-buildx
-          ansible-builder create -v 3 --output-file=Dockerfile
+#          ansible-builder create -v 3 --output-file=Dockerfile
 #          docker buildx build \
 #            --push \
 #            --platform ${{ matrix.platform }} \
 #            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
 #            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
 #            context
+
+      - name: Create build files
+        id: build-image
+        working-directory: ${{ inputs.EE_FOLDER_NAME }}
+        run: |
+          ansible-builder create -v 3 --output-file=Dockerfile
 
       - name: Build
         id: build
