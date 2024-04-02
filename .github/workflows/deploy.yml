@@ -108,35 +108,5 @@ jobs:
           echo "`cat Containerfile`" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
-  push-manifest:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log in to quay.io
-        id: registry-quay
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: quay.io
-          username: ${{ secrets.REDHAT_USERNAME }}
-          password: ${{ secrets.REDHAT_PASSWORD }}
 
-      - name: Create and Push Docker Manifest
-        run: |
-          # Enable experimental feature for Docker CLI
-          export DOCKER_CLI_EXPERIMENTAL=enabled
-          
-          # Define image path
-          IMAGE_PATH="quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}"
-          
-          # Create Docker manifest
-          docker manifest create $IMAGE_PATH:latest \
-            $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-amd64 \
-            $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-arm64
-          
-          # Annotate each architecture-specific manifest (if necessary)
-          docker manifest annotate $IMAGE_PATH:latest $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-amd64 --arch amd64
-          docker manifest annotate $IMAGE_PATH:latest $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-arm64 --arch arm64
-          
-          # Push the manifest to the registry
-          docker manifest push --purge $IMAGE_PATH:latest
 
