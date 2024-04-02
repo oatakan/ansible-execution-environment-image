@@ -117,8 +117,8 @@ jobs:
         uses: redhat-actions/podman-login@v1
         with:
           registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
+          username: ${{ secrets.REDHAT_USERNAME }}
+          password: ${{ secrets.REDHAT_PASSWORD }}
 
       - name: Create and Push Docker Manifest
         run: |
