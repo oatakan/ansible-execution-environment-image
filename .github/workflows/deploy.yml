@@ -83,40 +83,40 @@ jobs:
 #          --tag=${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
 #          --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
 
-      - name: Build and push image
+      - name: Create build files
         id: build-image
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
         run: |
-          docker buildx create --name ${{ inputs.EE_FOLDER_NAME }}-buildx
-          docker buildx use ${{ inputs.EE_FOLDER_NAME }}-buildx
+#          docker buildx create --name ${{ inputs.EE_FOLDER_NAME }}-buildx
+#          docker buildx use ${{ inputs.EE_FOLDER_NAME }}-buildx
           ansible-builder create -v 3 --output-file=Dockerfile
-          docker buildx build \
-            --push \
-            --platform ${{ matrix.platform }} \
-            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
-            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
-            context
+#          docker buildx build \
+#            --push \
+#            --platform ${{ matrix.platform }} \
+#            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
+#            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
+#            context
 
-#      - name: Build
-#        id: build
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: "{{defaultContext}}:${{ inputs.EE_FOLDER_NAME }}/context"
-#          platforms: ${{ matrix.platform }}
-#          push: false
-#          tags: |
-#            ${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-#            ${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
+      - name: Build
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:${{ inputs.EE_FOLDER_NAME }}/context"
+          platforms: ${{ matrix.platform }}
+          push: false
+          tags: |
+            ${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+            ${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
 
-#      - name: Push To quay.io
-#        id: push-to-quay
-#        uses: redhat-actions/push-to-registry@v2
-#        with:
-#          image: ${{ inputs.EE_FOLDER_NAME }}
-#          tags: |
-#            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-#            ${{ github.sha }}
-#          registry: quay.io/${{ inputs.QUAY_USER }}/
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ inputs.EE_FOLDER_NAME }}
+          tags: |
+            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+            ${{ github.sha }}
+          registry: quay.io/${{ inputs.QUAY_USER }}/
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
