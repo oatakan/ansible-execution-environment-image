@@ -103,26 +103,30 @@ jobs:
         run: |
           ansible-builder create -v 3 --output-file=Dockerfile
 
-      - name: Build
+      - name: Build and push
         id: build
         uses: docker/build-push-action@v5
         with:
           context: "${{ inputs.EE_FOLDER_NAME }}/context"
           platforms: ${{ matrix.platform }}
-          push: false
+          push: true
           tags: |
-            ${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-            ${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
+            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
 
-      - name: Push To quay.io
-        id: push-to-quay
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ inputs.EE_FOLDER_NAME }}
-          tags: |
-            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-            ${{ github.sha }}
-          registry: quay.io/${{ inputs.QUAY_USER }}/
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+
+#      - name: Push To quay.io
+#        id: push-to-quay
+#        uses: redhat-actions/push-to-registry@v2
+#        with:
+#          image: ${{ inputs.EE_FOLDER_NAME }}
+#          tags: |
+#            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+#            ${{ github.sha }}
+#          registry: quay.io/${{ inputs.QUAY_USER }}/
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
