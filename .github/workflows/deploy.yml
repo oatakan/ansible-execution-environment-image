@@ -34,6 +34,9 @@ on:
         description: 'needed for registry login'
         required: false
 
+env:
+  REGISTRY_IMAGE: quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
@@ -97,36 +100,43 @@ jobs:
 #            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
 #            context
 
+#      - name: Create build files
+#        id: build-image
+#        working-directory: ${{ inputs.EE_FOLDER_NAME }}
+#        run: |
+#          ansible-builder create -v 3 --output-file=Dockerfile
+
+#      - name: Build and push
+#        id: build
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: "${{ inputs.EE_FOLDER_NAME }}/context"
+#          platforms: ${{ matrix.platform }}
+#          push: true
+#          tags: |
+#            ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+#            ${{ env.REGISTRY_IMAGE }}:${{ github.sha }}
+
       - name: Create build files
         id: build-image
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
         run: |
           ansible-builder create -v 3 --output-file=Dockerfile
+          podman buildx build \
+            --platform ${{ matrix.platform }} \
+            --tag=${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
+            --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
+            context
 
-      - name: Build and push
-        id: build
-        uses: docker/build-push-action@v5
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
         with:
-          context: "${{ inputs.EE_FOLDER_NAME }}/context"
-          platforms: ${{ matrix.platform }}
-          push: true
+          image: ${{ inputs.EE_FOLDER_NAME }}
           tags: |
-            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
-
-      - name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-
-#      - name: Push To quay.io
-#        id: push-to-quay
-#        uses: redhat-actions/push-to-registry@v2
-#        with:
-#          image: ${{ inputs.EE_FOLDER_NAME }}
-#          tags: |
-#            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-#            ${{ github.sha }}
-#          registry: quay.io/${{ inputs.QUAY_USER }}/
+            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+            ${{ github.sha }}
+          registry: quay.io/${{ inputs.QUAY_USER }}/
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
@@ -168,18 +178,15 @@ jobs:
           # Enable experimental feature for Docker CLI
           export DOCKER_CLI_EXPERIMENTAL=enabled
           
-          # Define image path
-          IMAGE_PATH="quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}"
-          
           # Create Docker manifest
-          docker manifest create $IMAGE_PATH:latest \
-            $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-amd64 \
-            $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-arm64
+          docker manifest create ${{ env.REGISTRY_IMAGE }}:latest \
+            ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-amd64 \
+            ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-arm64
           
           # Annotate each architecture-specific manifest
-          docker manifest annotate $IMAGE_PATH:latest $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-amd64 --arch amd64
-          docker manifest annotate $IMAGE_PATH:latest $IMAGE_PATH:${{ inputs.EE_IMAGE_TAG }}-arm64 --arch arm64
+          docker manifest annotate ${{ env.REGISTRY_IMAGE }}:latest ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-amd64 --arch amd64
+          docker manifest annotate ${{ env.REGISTRY_IMAGE }}:latest ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-arm64 --arch arm64
           
           # Push the manifest to the registry
-          docker manifest push --purge $IMAGE_PATH:latest
+          docker manifest push --purge ${{ env.REGISTRY_IMAGE }}:latest
 
