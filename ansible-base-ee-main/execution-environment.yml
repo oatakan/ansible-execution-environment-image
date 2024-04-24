@@ -57,6 +57,7 @@ dependencies:
     gcc [platform:rpm]
     gcc-c++ [platform:rpm]
     openssl-devel [compile]
+    libxcrypt-compat [platform:rpm]
   python: |
     ansible
     jinja2>=2.11.2

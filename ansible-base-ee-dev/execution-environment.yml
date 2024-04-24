@@ -64,6 +64,7 @@ dependencies:
     freetds-devel [platform:rpm compile]
     gcc [platform:rpm]
     gcc-c++ [platform:rpm]
+    libxcrypt-compat [platform:rpm]
   python: |
     git+https://github.com/ansible/ansible-sign
     ncclient
