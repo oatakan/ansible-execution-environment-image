@@ -38,6 +38,7 @@ dependencies:
       - name: ansible.netcommon
       - name: vmware.vmware_rest
       - name: chocolatey.chocolatey
+      - name: microsoft.ad
   system: |
     which [platform:rpm]
     git-core [platform:rpm]
@@ -95,6 +96,7 @@ dependencies:
     pandas
 additional_build_steps:
   append_base:
+    - RUN dnf update -y
     - RUN $PYCMD -m pip install --upgrade pip setuptools wheel
     # this is needed for arm64 until the issue #619 with pendulum resolved
     - RUN if [ "$(uname -m)" = "aarch64" ]; then $PYCMD -m pip install msgraph_sdk; fi
