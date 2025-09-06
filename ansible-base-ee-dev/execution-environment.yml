@@ -26,6 +26,7 @@ dependencies:
       - name: ovirt.ovirt
       - name: ansible.posix
       - name: ansible.windows
+      - name: ansible.utils
       - name: community.general
       - name: community.windows
       - name: community.azure
@@ -34,6 +35,7 @@ dependencies:
       - name: community.okd
       - name: community.postgresql
       - name: community.mysql
+      - name: community.docker
       - name: kubernetes.core
       - name: ansible.netcommon
       - name: vmware.vmware_rest
