@@ -98,5 +98,5 @@ additional_build_steps:
     - COPY --from=quay.io/project-receptor/receptor:latest /usr/bin/receptor /usr/bin/receptor
     - RUN mkdir -p /var/run/receptor
     - RUN pip uninstall urllib3 requests -y && pip install urllib3 requests
-    - RUN dnf install -y https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/33/Everything/x86_64/os/Packages/c/chntpw-1.00-7.140201.fc33.x86_64.rpm
+    - RUN dnf install -y https://dl.fedoraproject.org/pub/fedora/linux/releases/41/Everything/$(arch)/os/Packages/c/chntpw-1.00-18.140201.fc41.$(arch).rpm
     - RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && rm get_helm.sh
