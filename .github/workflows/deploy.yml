@@ -122,7 +122,7 @@ jobs:
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
         run: |
           ansible-builder create -v 3 --output-file=Dockerfile
-          podman buildx build \
+          podman build \
             --platform ${{ matrix.platform }} \
             --tag=${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
             --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
@@ -137,6 +137,8 @@ jobs:
             ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
             ${{ github.sha }}
           registry: quay.io/${{ inputs.QUAY_USER }}/
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
