@@ -105,8 +105,8 @@ jobs:
           echo 'podman run ${{ inputs.EE_FOLDER_NAME }} ansible-galaxy collection list' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-          echo '## :pushpin: Containerfile:' >> $GITHUB_STEP_SUMMARY
+          echo '## :pushpin: Containerfile (first 60 lines):' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo 'cat Containerfile' >> $GITHUB_STEP_SUMMARY
+          head -n 60 Containerfile >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
