@@ -69,98 +69,38 @@ jobs:
       - name: Install python requirements (ansible-builder)
         run: pip install -r requirements.txt
 
-      - name: Log in to quay.io
-        id: registry-quay
-        uses: redhat-actions/podman-login@v1
+      - name: Log in to Quay.io
+        uses: docker/login-action@v3
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
 
-#      - name: Build image
-#        id: build-image
-#        working-directory: ${{ inputs.EE_FOLDER_NAME }}
-#        run: |
-#          ansible-builder build -v 3 \
-#          --context=../${{ inputs.EE_FOLDER_NAME }} \
-#          --tag=${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
-#          --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
-
-#      - name: Create build files
-#        id: build-image
-#        working-directory: ${{ inputs.EE_FOLDER_NAME }}
-#        run: |
-#          docker buildx create --name ${{ inputs.EE_FOLDER_NAME }}-buildx
-#          docker buildx use ${{ inputs.EE_FOLDER_NAME }}-buildx
-#          ansible-builder create -v 3 --output-file=Dockerfile
-#          docker buildx build \
-#            --push \
-#            --platform ${{ matrix.platform }} \
-#            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
-#            --tag=quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
-#            context
-
-#      - name: Create build files
-#        id: build-image
-#        working-directory: ${{ inputs.EE_FOLDER_NAME }}
-#        run: |
-#          ansible-builder create -v 3 --output-file=Dockerfile
-
-#      - name: Build and push
-#        id: build
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: "${{ inputs.EE_FOLDER_NAME }}/context"
-#          platforms: ${{ matrix.platform }}
-#          push: true
-#          tags: |
-#            ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-#            ${{ env.REGISTRY_IMAGE }}:${{ github.sha }}
-
       - name: Create build files
-        id: build-image
+        id: create-build-files
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
         run: |
-          ansible-builder create -v 3 --output-file=Dockerfile
-          podman build \
-            --platform ${{ matrix.platform }} \
-            --tag=${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }} \
-            --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
-            context
+          ansible-builder create -v 3 --output-file=context/Dockerfile
 
-      - name: Tag and Push to Quay.io
-        id: push-to-quay
-        run: |
-          # Explicit login to ensure credentials are active in this shell
-          podman login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
-
-          # Define variables
-          IMAGE_NAME="${{ inputs.EE_FOLDER_NAME }}"
-          REGISTRY_URL="quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}"
-          TAG_SPECIFIC="${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}"
-          TAG_SHA="${{ github.sha }}"
-
-          # Tag images for registry
-          podman tag "${IMAGE_NAME}:${TAG_SPECIFIC}" "${REGISTRY_URL}:${TAG_SPECIFIC}"
-          podman tag "${IMAGE_NAME}:${TAG_SHA}" "${REGISTRY_URL}:${TAG_SHA}"
-
-          # Push images
-          echo "Pushing ${REGISTRY_URL}:${TAG_SPECIFIC}..."
-          podman push "${REGISTRY_URL}:${TAG_SPECIFIC}"
-          
-          echo "Pushing ${REGISTRY_URL}:${TAG_SHA}..."
-          podman push "${REGISTRY_URL}:${TAG_SHA}"
-
-          # Set output for summary
-          echo "registry-path=${REGISTRY_URL}:${TAG_SPECIFIC}" >> $GITHUB_OUTPUT
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.EE_FOLDER_NAME }}/context
+          file: ${{ inputs.EE_FOLDER_NAME }}/context/Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: |
+            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
         run: |
           echo "## :rocket: Usage" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Image pushed to repository: [${{ steps.push-to-quay.outputs.registry-path }}](https://${{ steps.push-to-quay.outputs.registry-path }})" >> $GITHUB_STEP_SUMMARY
-          echo "> \`podman pull ${{ steps.push-to-quay.outputs.registry-path }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Image pushed to repository: quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}" >> $GITHUB_STEP_SUMMARY
+          echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}\`" >> $GITHUB_STEP_SUMMARY
+
           echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "## :pushpin: Ansible info:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -181,9 +121,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Log in to quay.io
-        id: registry-quay
-        uses: redhat-actions/podman-login@v1
+      - name: Log in to Quay.io
+        uses: docker/login-action@v3
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
