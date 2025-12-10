@@ -78,6 +78,10 @@ jobs:
           file: ${{ inputs.EE_FOLDER_NAME }}/context/Dockerfile
           # Build multi-arch in a single invocation to avoid manual manifest work
           platforms: ${{ join(fromJson(inputs.PLATFORMS_JSON), ',') }}
+          # Quay occasionally returns 413/502 on large pushes; retry and keep payload small
+          push-attempts: 3
+          provenance: false
+          sbom: false
           push: true
           tags: |
             quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}
