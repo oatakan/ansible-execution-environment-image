@@ -43,19 +43,8 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: ${{ fromJson(inputs.PLATFORMS_JSON) }}
     environment: deploy
     steps:
-
-      # In this job, all steps begin with a name
-      - name: Get platform name
-        id: get-platform-name
-        run: |
-          platform_name=$(echo ${{ matrix.platform }} | cut -d '/' -f2)
-          echo "PLATFORM_PAIR=${platform_name}" >> $GITHUB_ENV
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -87,10 +76,11 @@ jobs:
         with:
           context: ${{ inputs.EE_FOLDER_NAME }}/context
           file: ${{ inputs.EE_FOLDER_NAME }}/context/Dockerfile
-          platforms: ${{ matrix.platform }}
+          # Build multi-arch in a single invocation to avoid manual manifest work
+          platforms: ${{ join(fromJson(inputs.PLATFORMS_JSON), ',') }}
           push: true
           tags: |
-            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
+            quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}
             quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
 
       - name: Print summary
@@ -98,8 +88,8 @@ jobs:
         run: |
           echo "## :rocket: Usage" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Image pushed to repository: quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}" >> $GITHUB_STEP_SUMMARY
-          echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Image pushed to repository: quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
+          echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}\`" >> $GITHUB_STEP_SUMMARY
 
           echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "## :pushpin: Ansible info:" >> $GITHUB_STEP_SUMMARY
@@ -116,32 +106,4 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "`cat Containerfile`" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-  push-manifest:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log in to Quay.io
-        uses: docker/login-action@v3
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
-
-      - name: Create and Push Docker Manifest
-        run: |
-          # Enable experimental feature for Docker CLI
-          export DOCKER_CLI_EXPERIMENTAL=enabled
-          
-          # Create Docker manifest
-          docker manifest create ${{ env.REGISTRY_IMAGE }}:latest \
-            ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-amd64 \
-            ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-arm64
-          
-          # Annotate each architecture-specific manifest
-          docker manifest annotate ${{ env.REGISTRY_IMAGE }}:latest ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-amd64 --arch amd64
-          docker manifest annotate ${{ env.REGISTRY_IMAGE }}:latest ${{ env.REGISTRY_IMAGE }}:${{ inputs.EE_IMAGE_TAG }}-arm64 --arch arm64
-          
-          # Push the manifest to the registry
-          docker manifest push --purge ${{ env.REGISTRY_IMAGE }}:latest
 
