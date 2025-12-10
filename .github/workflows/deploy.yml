@@ -78,8 +78,7 @@ jobs:
           file: ${{ inputs.EE_FOLDER_NAME }}/context/Dockerfile
           # Build multi-arch in a single invocation to avoid manual manifest work
           platforms: ${{ join(fromJson(inputs.PLATFORMS_JSON), ',') }}
-          # Quay occasionally returns 413/502 on large pushes; retry and keep payload small
-          push-attempts: 3
+          # Quay occasionally returns 413/502 on large pushes; keep payload small
           provenance: false
           sbom: false
           push: true
@@ -90,24 +89,24 @@ jobs:
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
         run: |
-          echo "## :rocket: Usage" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '## :rocket: Usage' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
           echo "Image pushed to repository: quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
-          echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}\`" >> $GITHUB_STEP_SUMMARY
+          echo '> `podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}`' >> $GITHUB_STEP_SUMMARY
+          echo '> `podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}`' >> $GITHUB_STEP_SUMMARY
 
-          echo "> \`podman pull quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "## :pushpin: Ansible info:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "`podman run ${{ inputs.EE_FOLDER_NAME }} ansible --version`" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "## :pushpin: Installed collections:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "`podman run ${{ inputs.EE_FOLDER_NAME }} ansible-galaxy collection list`" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "## :pushpin: Containerfile:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "`cat Containerfile`" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo '## :pushpin: Ansible info:' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo 'podman run ${{ inputs.EE_FOLDER_NAME }} ansible --version' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo '## :pushpin: Installed collections:' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo 'podman run ${{ inputs.EE_FOLDER_NAME }} ansible-galaxy collection list' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo '## :pushpin: Containerfile:' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo 'cat Containerfile' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
