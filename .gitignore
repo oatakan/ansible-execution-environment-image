@@ -27,5 +27,3 @@ ansible-base-ee-*/ansible-base-ee-*/
 
 # MacOS
 .DS_Store
-
-.devcontainer/
