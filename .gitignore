@@ -22,6 +22,8 @@ venv/
 
 # EE builds
 **/_build/
+**/context/
+ansible-base-ee-*/ansible-base-ee-*/
 
 # MacOS
 .DS_Store
