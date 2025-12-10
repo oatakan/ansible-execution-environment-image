@@ -128,17 +128,28 @@ jobs:
             --tag=${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }} \
             context
 
-      - name: Push To quay.io
+      - name: Tag and Push to Quay.io
         id: push-to-quay
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ inputs.EE_FOLDER_NAME }}
-          tags: |
-            ${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}
-            ${{ github.sha }}
-          registry: quay.io/${{ inputs.QUAY_USER }}/
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
+        run: |
+          # Define variables
+          IMAGE_NAME="${{ inputs.EE_FOLDER_NAME }}"
+          REGISTRY_URL="quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}"
+          TAG_SPECIFIC="${{ inputs.EE_IMAGE_TAG }}-${{ env.PLATFORM_PAIR }}"
+          TAG_SHA="${{ github.sha }}"
+
+          # Tag images for registry
+          podman tag "${IMAGE_NAME}:${TAG_SPECIFIC}" "${REGISTRY_URL}:${TAG_SPECIFIC}"
+          podman tag "${IMAGE_NAME}:${TAG_SHA}" "${REGISTRY_URL}:${TAG_SHA}"
+
+          # Push images
+          echo "Pushing ${REGISTRY_URL}:${TAG_SPECIFIC}..."
+          podman push "${REGISTRY_URL}:${TAG_SPECIFIC}"
+          
+          echo "Pushing ${REGISTRY_URL}:${TAG_SHA}..."
+          podman push "${REGISTRY_URL}:${TAG_SHA}"
+
+          # Set output for summary
+          echo "registry-path=${REGISTRY_URL}:${TAG_SPECIFIC}" >> $GITHUB_OUTPUT
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
