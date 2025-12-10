@@ -131,6 +131,9 @@ jobs:
       - name: Tag and Push to Quay.io
         id: push-to-quay
         run: |
+          # Explicit login to ensure credentials are active in this shell
+          podman login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
+
           # Define variables
           IMAGE_NAME="${{ inputs.EE_FOLDER_NAME }}"
           REGISTRY_URL="quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}"
