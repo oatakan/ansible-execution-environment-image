@@ -37,6 +37,11 @@ ansible-builder build -v 3 --context=ansible-base-ee-dev --tag=ansible-base-ee-d
   - Base: `quay.io/ansible/ansible-runner:latest`
   - Includes `chocolatey` via git dependency.
 
+- **2.16 Environment (`ansible-base-ee-2.16`)**:
+  - Base: `quay.io/centos/centos:stream9`
+  - Purpose: Retains Ansible Core 2.16 for RHEL 8 / Python 3.6 managed node support.
+  - Customizations: Similar to `dev` (Python 3.12 controller), but pins `ansible-core>=2.16,<2.17`.
+
 ## Common Patterns
 
 - **Pinning Versions**: Dependencies in `execution-environment.yml` should generally be pinned for reproducibility.

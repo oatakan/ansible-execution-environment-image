@@ -1,0 +1,128 @@
+---
+version: 3
+images:
+  base_image:
+    name: quay.io/centos/centos:stream9
+dependencies:
+  ansible_core:
+    # Pin to 2.16 for RHEL 8 / Python 3.6 target support
+    package_pip: ansible-core>=2.16,<2.17
+  ansible_runner:
+    package_pip: ansible-runner
+  galaxy: |
+    ---
+    collections:
+      - name: awx.awx
+      # - name: azure.azcollection # Disabled due to uamqp build failure on ARM64 (cmake compatibility)
+      - name: amazon.aws
+      - name: amazon.cloud
+      - name: theforeman.foreman
+      - name: google.cloud
+      - name: openstack.cloud
+      - name: community.vmware
+        version: 3.9.0  # pinning until 4.0.1 is released with pr #1919
+      - name: community.aws
+      - name: community.crypto
+      - name: ovirt.ovirt
+      - name: ansible.posix
+      - name: ansible.windows
+      - name: ansible.utils
+      - name: community.general
+      - name: community.windows
+      # - name: community.azure # Disabled due to uamqp build failure on ARM64
+      - name: community.kubernetes
+    #  - name: community.kubevirt # disable as it's not compatible with the latest version of Ansible
+      - name: community.okd
+      - name: community.postgresql
+      - name: community.mysql
+      - name: community.docker
+      - name: kubernetes.core
+      - name: ansible.netcommon
+      - name: vmware.vmware_rest
+      - name: chocolatey.chocolatey
+      - name: microsoft.ad
+  system: |
+    which [platform:rpm]
+    git-core [platform:rpm]
+    python3.12-devel [platform:rpm compile]
+    libcurl-devel [platform:rpm compile]
+    krb5-devel [platform:rpm compile]
+    krb5-workstation [platform:rpm]
+    subversion [platform:rpm]
+    subversion [platform:dpkg]
+    git-lfs [platform:rpm]
+    sshpass [platform:rpm]
+    rsync [platform:rpm]
+    #epel-release [platform:rpm]
+    python-unversioned-command [platform:rpm]
+    unzip [platform:rpm]
+    mkisofs [platform:rpm]
+    coreos-installer [platform:rpm]
+    libnsl [platform:rpm]
+    file [platform:rpm]
+    aria2 [platform:rpm]
+    cabextract [platform:rpm]
+    wimlib-utils [platform:rpm]
+    genisoimage [platform:rpm]
+    freetds-devel [platform:rpm compile]
+    gcc [platform:rpm]
+    gcc-c++ [platform:rpm]
+    libxcrypt-compat [platform:rpm]
+    libffi-devel [platform:rpm]
+    bzip2-devel [platform:rpm]
+    openssl-devel [platform:rpm]
+  python: |
+    git+https://github.com/ansible/ansible-sign
+    ncclient
+    paramiko
+    pykerberos
+    pyOpenSSL>=23.2.0
+    pypsrp[kerberos,credssp]
+    pywinrm[kerberos,credssp]
+    requests-credssp
+    toml
+    pexpect>=4.5
+    python-daemon
+    pyyaml
+    six
+    jinja2>=2.11.2
+    awxkit>=19.0.0
+    netaddr>=0.8.0
+    pyprowl>=3.0.1
+    passlib>=1.7.4
+    pyapi-gitlab>=7.8.5
+    # pysnow>=0.7.17
+    aiohttp>=3.8.3
+    pymssql>=2.2.5
+    sendgrid==1.6.22
+    bs4>=0.0.1
+    html5lib>=1.1
+    openstacksdk>=1.0
+    pandas>=2.0.0
+    numpy>=1.25.0,<2.0
+    # pytz<2020.0
+additional_build_steps:
+  prepend_base:
+    - RUN dnf update -y
+    - RUN dnf install -y python3.12 python3.12-devel python3.12-pip python3.12-setuptools python3.12-wheel
+    - RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+    - RUN alternatives --set python3 /usr/bin/python3.12
+    - RUN alternatives --install /usr/bin/pip3 pip3 /usr/bin/pip3.12 1
+    - RUN alternatives --set pip3 /usr/bin/pip3.12
+  append_base:
+    - RUN $PYCMD -m pip install --upgrade pip setuptools wheel
+    # this is needed for arm64 until the issue #619 with pendulum resolved
+    - RUN if [ "$(uname -m)" = "aarch64" ]; then $PYCMD -m pip install msgraph_sdk; fi
+    - RUN dnf install -y epel-release
+    - RUN dnf install -y dnf-plugins-core
+    - RUN dnf config-manager --set-enabled crb
+    - RUN dnf install -y nfs-utils fuse fuse-devel libnfs libnfs-devel gcc git make automake autoconf libtool
+    - RUN git clone https://github.com/sahlberg/fuse-nfs.git && cd fuse-nfs && ./setup.sh && ./configure && make && make install
+    - RUN dnf install -y python3.12-devel
+  append_final:
+    - COPY --from=quay.io/ansible/receptor:devel /usr/bin/receptor /usr/bin/receptor
+    - RUN mkdir -p /var/run/receptor
+    - RUN git lfs install --system
+    - RUN /usr/bin/python3.12 -m pip uninstall ansible-runner -y && /usr/bin/python3.12 -m pip install git+https://github.com/ansible/ansible-runner.git
+    - RUN dnf install -y https://dl.fedoraproject.org/pub/fedora/linux/releases/41/Everything/$(arch)/os/Packages/c/chntpw-1.00-18.140201.fc41.$(arch).rpm
+    - RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && rm get_helm.sh

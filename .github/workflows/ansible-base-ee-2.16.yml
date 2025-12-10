@@ -1,0 +1,27 @@
+# Workflow name
+name: Base 2.16 EE build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'ansible-base-ee-2.16/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  call-deploy-workflow:
+    uses:  oatakan/ansible-execution-environment-image/.github/workflows/deploy.yml@main
+    with:
+      EE_FOLDER_NAME: 'ansible-base-ee-2.16'
+      EE_IMAGE_TAG: 'latest'
+      QUAY_USER: 'oatakan'
+      PLATFORMS_JSON: '["linux/amd64", "linux/arm64"]'
+    secrets:
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
