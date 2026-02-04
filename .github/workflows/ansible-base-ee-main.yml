@@ -21,7 +21,7 @@ jobs:
       EE_FOLDER_NAME: 'ansible-base-ee-main'
       EE_IMAGE_TAG: 'latest'
       QUAY_USER: 'oatakan'
-      PLATFORMS_JSON: '["linux/amd64", "linux/arm64"]'
+      PLATFORMS_JSON: '["linux/amd64"]'
     secrets:
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
