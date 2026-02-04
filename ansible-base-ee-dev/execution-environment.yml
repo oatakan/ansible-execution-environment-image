@@ -98,7 +98,7 @@ dependencies:
     bs4>=0.0.1
     html5lib>=1.1
     openstacksdk>=1.0
-    pandas>=2.0.0,<2.1.0
+    pandas>=2.3.3
     numpy>=1.25.0,<2.0
     # pytz<2020.0
 additional_build_steps:
