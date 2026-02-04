@@ -17,7 +17,6 @@ dependencies:
       - name: google.cloud
       - name: openstack.cloud
       - name: community.vmware
-        version: 3.9.0  # pinning until 4.0.1 is released with pr #1919
       - name: community.aws
       - name: community.crypto
       - name: ovirt.ovirt
@@ -39,6 +38,7 @@ dependencies:
         type: git
         version: update_reqs
       - name: microsoft.ad
+      - name: vmware.vmware
   system: |
     python38-devel [platform:rpm compile]
     subversion [platform:rpm]
