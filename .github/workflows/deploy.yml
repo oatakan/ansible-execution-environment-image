@@ -49,11 +49,36 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Disk usage (before)
+        shell: bash
+        run: |
+          set -euo pipefail
+          df -h
+          docker system df || true
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Free disk space
+        shell: bash
+        run: |
+          set -euo pipefail
+          # GitHub-hosted runners ship with large preinstalled toolchains.
+          # Removing them is safe for this workflow and helps prevent sporadic
+          # build failures caused by running out of disk during multi-arch builds.
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android || true
+          sudo apt-get clean || true
+          sudo rm -rf /var/lib/apt/lists/* || true
+
+          # Clear any pre-existing Docker/buildx state to maximize free space.
+          docker system prune -af --volumes || true
+          docker buildx prune -af || true
+
+          df -h
+          docker system df || true
 
       - name: Install python requirements (ansible-builder)
         run: pip install -r requirements.txt
@@ -85,6 +110,14 @@ jobs:
           tags: |
             quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}
             quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}
+
+      - name: Disk usage (after)
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          df -h
+          docker system df || true
 
       - name: Print summary
         working-directory: ${{ inputs.EE_FOLDER_NAME }}
