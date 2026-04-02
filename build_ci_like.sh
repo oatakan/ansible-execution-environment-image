@@ -16,6 +16,31 @@ set -euo pipefail
 #   - Use --platforms linux/amd64 to match CI and avoid host-arch drift.
 #   - Multi-arch builds cannot be --load'ed; this script will export an OCI artifact instead.
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+REPO_ROOT="${SCRIPT_DIR}"
+LOCAL_BUILD_ENV_FILE="${REPO_ROOT}/.ee-build.env"
+LOCAL_ANSIBLE_BUILDER_BIN="${REPO_ROOT}/.venv/bin/ansible-builder"
+
+resolve_repo_path() {
+  local path="${1:-}"
+  if [[ -z "${path}" ]]; then
+    return 1
+  fi
+  case "${path}" in
+    ~)
+      path="${HOME}"
+      ;;
+    ~/*)
+      path="${HOME}/${path#~/}"
+      ;;
+  esac
+  if [[ "${path}" = /* ]]; then
+    printf '%s\n' "${path}"
+  else
+    printf '%s\n' "${REPO_ROOT}/${path}"
+  fi
+}
+
 EE_DIR=${1:-}
 shift || true
 
@@ -27,6 +52,28 @@ fi
 if [[ ! -d "${EE_DIR}" ]]; then
   echo "Error: Directory '${EE_DIR}' does not exist." >&2
   exit 2
+fi
+
+EE_BUILD_ENV_FILE="$(resolve_repo_path "${EE_BUILD_ENV_FILE:-${LOCAL_BUILD_ENV_FILE}}")"
+if [[ -f "${EE_BUILD_ENV_FILE}" ]]; then
+  echo "Info: loading build config from ${EE_BUILD_ENV_FILE}"
+  set -a
+  # shellcheck disable=SC1090
+  source "${EE_BUILD_ENV_FILE}"
+  set +a
+fi
+
+if [[ -z "${RHN_CS_API_OFFLINE_TOKEN:-}" && -n "${EE_BUILD_SECRETS_FILE:-}" ]]; then
+  EE_BUILD_SECRETS_FILE="$(resolve_repo_path "${EE_BUILD_SECRETS_FILE}")"
+  if [[ -f "${EE_BUILD_SECRETS_FILE}" ]]; then
+    echo "Info: loading build secrets from configured file"
+    set -a
+    # shellcheck disable=SC1090
+    source "${EE_BUILD_SECRETS_FILE}"
+    set +a
+  else
+    echo "Warning: configured build secrets file not found." >&2
+  fi
 fi
 
 PLATFORMS=""
@@ -112,6 +159,15 @@ run_ansible_builder_create() {
     return 0
   fi
 
+  if [[ -x "${LOCAL_ANSIBLE_BUILDER_BIN}" ]]; then
+    (
+      cd "${EE_DIR}"
+      rm -rf context
+      "${LOCAL_ANSIBLE_BUILDER_BIN}" create -v 3 --context=context --output-filename=Dockerfile
+    )
+    return 0
+  fi
+
   echo "Info: ansible-builder not found locally; running it in python:3.12-bookworm"
   docker run --rm \
     -v "${PWD}:/work" \
@@ -149,6 +205,13 @@ BUILD_ARGS=(
   -f "${EE_DIR}/context/Dockerfile"
   "${EE_DIR}/context"
 )
+
+if [[ -n "${RHN_CS_API_OFFLINE_TOKEN:-}" ]]; then
+  BUILD_ARGS+=(--secret "id=rhn_cs_api_offline_token,env=RHN_CS_API_OFFLINE_TOKEN")
+  echo "Info: RHN_CS_API_OFFLINE_TOKEN detected; optional Red Hat certified collections will be installed."
+else
+  echo "Info: RHN_CS_API_OFFLINE_TOKEN not set; optional Red Hat certified collections will be skipped."
+fi
 
 if [[ "${NO_CACHE}" == "true" ]]; then
   BUILD_ARGS+=(--no-cache)

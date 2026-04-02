@@ -23,5 +23,6 @@ jobs:
       QUAY_USER: 'oatakan'
       PLATFORMS_JSON: '["linux/amd64", "linux/arm64"]'
     secrets:
+      RHN_CS_API_OFFLINE_TOKEN: ${{ secrets.RHN_CS_API_OFFLINE_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}

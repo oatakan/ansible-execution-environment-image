@@ -27,6 +27,9 @@ on:
         required: false
         type: string
     secrets:
+      RHN_CS_API_OFFLINE_TOKEN:
+        description: 'optional Red Hat Automation Hub token'
+        required: false
       QUAY_PASSWORD:
         description: 'needed for registry login'
         required: false
@@ -107,6 +110,8 @@ jobs:
           provenance: false
           sbom: false
           push: true
+          secrets: |
+            "rhn_cs_api_offline_token=${{ secrets.RHN_CS_API_OFFLINE_TOKEN }}"
           tags: |
             quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ inputs.EE_IMAGE_TAG }}
             quay.io/${{ inputs.QUAY_USER }}/${{ inputs.EE_FOLDER_NAME }}:${{ github.sha }}

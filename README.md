@@ -42,6 +42,16 @@ The script will:
 2. Build the container image locally.
 3. Run a verification step (`ansible --version`) inside the new image.
 
+### 🔐 Optional Red Hat Certified Collections
+
+If `RHN_CS_API_OFFLINE_TOKEN` is available, builds will also install the Red Hat certified `ansible.platform` and `ansible.controller` collections from Automation Hub.
+
+For local builds, both helper scripts will automatically source `.ee-build.env` from the repository root when it exists. That file is intended to point to a second file that exports `RHN_CS_API_OFFLINE_TOKEN`, so the token itself does not need to live in the primary config file. The referenced secrets file can be inside or outside the repository, including a path under your home directory. You can override the config file location with `EE_BUILD_ENV_FILE`.
+
+If the token is not present, the build continues and skips the optional Red Hat collections.
+
+In GitHub Actions, set the repository secret `RHN_CS_API_OFFLINE_TOKEN`. The workflow passes it to Docker as a BuildKit secret so it is not written into the image layers.
+
 ### 🏗️ Architecture Support
 
 These images are built for multiple architectures:

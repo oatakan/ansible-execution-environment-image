@@ -1,5 +1,8 @@
 ---
 version: 3
+additional_build_files:
+  - src: ../scripts/install_optional_redhat_collections.sh
+    dest: scripts
 images:
   base_image:
     name: quay.io/ansible/ansible-runner:latest
@@ -99,6 +102,8 @@ additional_build_steps:
     - RUN dnf install -y openssl-devel
     - RUN git clone https://github.com/rescatux/chntpw.git /tmp/chntpw && cd /tmp/chntpw && git checkout -q 0ec5c9cdf7a6855ca0c58e1fc01e2e15b2afa46b && make chntpw reged CFLAGS='-DUSEOPENSSL -g -I. -I/usr/include -Wall' OSSLLIB=/usr/lib64 && install -m 0755 chntpw /usr/local/bin/chntpw && install -m 0755 reged /usr/local/bin/reged && rm -rf /tmp/chntpw
     - RUN git clone https://github.com/sahlberg/fuse-nfs.git && cd fuse-nfs && ./setup.sh && ./configure && make && make install
+  append_galaxy:
+    - RUN --mount=type=secret,id=rhn_cs_api_offline_token /bin/bash /output/scripts/install_optional_redhat_collections.sh
   append_final:
     - RUN alternatives --set python /usr/bin/python3
     - COPY --from=quay.io/ansible/receptor:devel /usr/bin/receptor /usr/bin/receptor
