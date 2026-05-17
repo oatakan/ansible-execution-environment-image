@@ -8,7 +8,7 @@ images:
     name: quay.io/ansible/ansible-runner:latest
 dependencies:
   ansible_core:
-    package_pip: ansible-core>=2.13,<2.14
+    package_pip: ansible-core>=2.13,<2.15
   galaxy: |
     ---
     collections:
@@ -36,6 +36,7 @@ dependencies:
       - name: community.mysql
       - name: kubernetes.core
       - name: ansible.netcommon
+        version: "8.4.0"
       - name: vmware.vmware_rest
       #- name: chocolatey.chocolatey # requirements conflict with community.vmware
       - name: https://github.com/oatakan/chocolatey-ansible.git#/chocolatey/
