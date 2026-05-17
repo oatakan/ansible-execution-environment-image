@@ -48,6 +48,8 @@ dependencies:
     subversion [platform:rpm]
     subversion [platform:dpkg]
     git-lfs [platform:rpm]
+    skopeo [platform:rpm]
+    skopeo [platform:dpkg]
     mkisofs [platform:rpm]
     openssl [platform:rpm]
     coreos-installer [platform:rpm]

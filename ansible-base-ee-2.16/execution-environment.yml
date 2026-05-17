@@ -48,6 +48,7 @@ dependencies:
     which [platform:rpm]
     git-core [platform:rpm]
     python3.12-devel [platform:rpm compile]
+    skopeo [platform:rpm]
     libcurl-devel [platform:rpm compile]
     krb5-devel [platform:rpm compile]
     krb5-workstation [platform:rpm]
